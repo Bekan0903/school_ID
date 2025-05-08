@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: digital_school_ID
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn digital_school_ID.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: MYSQL_DATABASE
+        value: school_id_db
+      - key: MYSQL_USERNAME
+        value: admin
+      - key: MYSQL_PASSWORD
+        syncValue: false  # Manually enter in Render dashboard
+      - key: MYSQL_HOST
+        value: your-mysql-host.com
