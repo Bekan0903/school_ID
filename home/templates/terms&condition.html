@@ -1,0 +1,79 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions</title>
+    <link rel="stylesheet" href="{% static 'css/terms&condition.css' %}"> <!-- Link to external CSS -->
+</head>
+<body>
+
+    <div class="terms-container">
+        <h1><strong>Terms and Conditions</strong></h1>
+
+        <h2><strong>User Responsibilities</strong></h2>
+        <ul>
+            <li>Students and staff must use their digital ID responsibly.</li>
+            <li>QR Codes are unique and should not be shared or misused.</li>
+            <li>Parents will receive entry/exit notifications and must keep their contact details updated.</li>
+        </ul>
+
+        <h2><strong>Entry & Exit Tracking</strong></h2>
+        <ul>
+            <li>Scanning the QR Code at designated points registers a user's entry and exit times.</li>
+            <li>The school reserves the right to review these logs for security purposes.</li>
+        </ul>
+
+        <h2><strong>Library Book Borrowing</strong></h2>
+        <ul>
+            <li>Students can use their Digital ID to borrow books from the school library.</li>
+            <li>Each borrowed book must be returned by the due date.</li>
+            <li>Failure to return a book on time results in temporary suspension of digital ID privileges.</li>
+        </ul>
+
+        <h2><strong>Privacy & Data Security</strong></h2>
+        <ul>
+            <li>All personal information is securely stored and not shared with third parties without consent.</li>
+            <li>The system collects only necessary data (name, ID, activity logs).</li>
+        </ul>
+
+        <h2><strong>System Misuse & Penalties</strong></h2>
+        <ul>
+            <li>Any attempt to tamper with the system or use another person's ID is strictly prohibited.</li>
+            <li>Violations may lead to disciplinary actions, including suspension of ID privileges.</li>
+        </ul>
+
+        <h2><strong>Technical Issues & Support</strong></h2>
+        <ul>
+            <li>If a user faces issues, they should report them to the IT department.</li>
+            <li>The school is not responsible for network failures or unauthorized access due to negligence.</li>
+        </ul>
+
+        <h2><strong>Updates to Terms & Conditions</strong></h2>
+        <ul>
+            <li>The school may update these terms to improve security and functionality. Users will be notified of any significant changes.</li>
+        </ul>
+
+        <p><strong>By using the School Digital ID System, you acknowledge that you have read, understood, and agreed to these terms.</strong></p>
+        <div class="terms&conditions">
+            <label> I agree to the terms and conditions</label>
+            <input type="checkbox" name="terms" id="termsCheckbox" required>
+        </div>
+        
+        <button id="homeButton">Back to Home</button>
+    </div>
+
+    <script>
+        document.getElementById('homeButton').addEventListener('click', function(e) {
+            const checkbox = document.getElementById('termsCheckbox');
+            if (!checkbox.checked) {
+                alert('Please agree to the terms and conditions before proceeding.');
+                e.preventDefault(); // Prevent navigation
+            } else {
+                window.location.href = "{% url 'index' %}";
+            }
+        });
+    </script>
+</body>
+</html>

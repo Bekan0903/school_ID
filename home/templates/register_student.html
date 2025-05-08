@@ -1,0 +1,309 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <style>
+        /* Modern Dark Theme with Blue Accents */
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #333;
+            --input-bg: #2a2a2a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-header h2 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .registration-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-left: 6px solid var(--primary);
+        }
+        
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.25s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .file-input {
+            padding: 0.8rem;
+        }
+        
+        .file-input::-webkit-file-upload-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            margin-right: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+.file-input::-webkit-file-upload-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1.1rem;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+        
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem;
+            }
+            
+            .registration-card {
+                padding: 1.8rem;
+            }
+            
+            .form-header h2 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .registration-card {
+                padding: 1.5rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-header">
+            <h2><i class="fas fa-user-graduate"></i> Student Registration</h2>
+            <p>Please fill in all required fields</p>
+        </div>
+        
+        <div class="registration-card">
+            <form action="/insertstudent/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i>
+                        <span>Student Information</span>
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="student_name">Full Name</label>
+                            <input type="text" class="form-control" id="student_name" name="student_name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="student_class">Class</label>
+                            <input type="text" class="form-control" id="student_class" name="student_class" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="student_section">Section</label>
+                            <input type="text" class="form-control" id="student_section" name="student_section" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="student_age">Age</label>
+                            <input type="number" class="form-control" id="student_age" name="student_age" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="student_photo">Photo</label>
+                        <input type="file" class="form-control file-input" id="student_photo" name="student_photo" accept="image/*">
+
+</div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="student_phone">Phone Number</label>
+                            <input type="text" class="form-control" id="student_phone" name="student_phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="student_address">Local Address</label>
+                            <input type="text" class="form-control" id="student_address" name="student_address" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-users"></i>
+                        <span>Parent Information</span>
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="parent_name">Parent Name</label>
+                            <input type="text" class="form-control" id="parent_name" name="parent_name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="parent_relation">Relation</label>
+                            <input type="text" class="form-control" id="parent_relation" name="parent_relation" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="parent_email">Parent Email</label>
+                            <input type="email" class="form-control" id="parent_email" name="parent_email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="parent_phone">Parent Phone Number</label>
+                            <input type="text" class="form-control" id="parent_phone" name="parent_phone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="parent_address">Parent Local Address</label>
+                        <input type="text" class="form-control" id="parent_address" name="parent_address" required>
+                    </div>
+                </div>
+               
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-user-plus"></i>
+                    Register Student
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

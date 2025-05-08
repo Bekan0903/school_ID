@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile</title>
+</head>
+<body>
+    <h1>Student Profile</h1>
+    
+   {% for student in studentdata %}
+
+    <img src="{{ student.student_photo.url }}" alt="student photo" width="150">
+    <img src="{{ student.qr_code.url }}" alt="student QR Code" width="150">
+    <p><strong>Name:</strong> {{ student.student_name }}</p>
+    <p><strong>Class:</strong> {{ student.student_class }}{{ student.student_section }}</p>
+    <p><strong>Age:</strong> {{ student.student_age }}</p>
+    <p><strong>Phone:</strong> {{ student.student_phone }}</p>
+    <p><strong>Email:</strong> {{ student.student_email }}</p>
+    <p><strong>Address:</strong> {{ student.student_address }}</p>
+    <p><strong>Parent Name:</strong> {{ student.parent_name }}</p>
+    <p><strong>Parent Relation:</strong> {{ student.parent_relation }}</p>
+    <p><strong>Parent Email:</strong> {{ student.parent_email }}</p>
+    <p><strong>Parent Phone:</strong> {{ student.parent_phone }}</p>
+    {% endfor %}
+</body>
+</html>

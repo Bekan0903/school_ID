@@ -1,0 +1,59 @@
+/* General Page Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f6f5f7;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Container Styling */
+.terms-container {
+    background: #fff;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* Headings */
+h1 {
+    color: #FF4B2B;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+    margin-top: 20px;
+}
+
+/* Paragraph & List Styling */
+p, ul {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+/* Button Styling */
+button {
+    display: block;
+    margin: 20px auto;
+    background-color: blue;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #e03e1b;
+}

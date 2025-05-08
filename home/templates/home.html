@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital ID</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Digital ID</h2>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#help">Help</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <header class="fixed-header">
+                <h1>Digital School ID</h1>
+                <div class="auth-buttons">
+                    <a href="{% url 'login' %}" class="login-btn">Login</a>
+                    <a href="{% url 'register' %}" class="register-btn">Register</a>
+                </div>
+            </header>
+
+            <section id="home" class="full-page">
+                <div class="hero-content">
+                    <h2>Welcome to the Future of School Management</h2>
+                    <p>Our Digital School ID system streamlines administrative tasks, allowing staff to focus more on students and less on paperwork. With quick QR code scanning, students can easily check in for classes, borrow library books, and access school facilities without the hassle of manual sign-ins.</p>
+                    <p>Furthermore, our system enhances security by ensuring that only authorized individuals can access school premises, providing peace of mind to parents and educators alike. By adopting this cutting-edge technology, your school reduces its environmental footprint and sets a benchmark for innovation in education management.</p>
+                    <p><strong>Embrace the future today and transform how your school operates with our comprehensive Digital School ID system.</strong></p>
+                </div>
+            </section>
+
+            <section id="about" class="full-page">
+                <h2>About Us</h2>
+                <p>We are a team of dedicated IT students passionate about transforming school management through technology. Our Digital School ID project was born out of a need to modernize outdated manual systems and improve efficiency in student and staff identification, attendance tracking, and library management. Inspired by Ethiopia’s digital transformation goals, we aim to make schools smarter and more secure. Our mission is to replace traditional paper-based systems with a fully digitalized solution that benefits students, teachers, and school administrators alike</p>
+            </section>
+
+            <section id="features" class="full-page">
+                <h2>Features</h2>
+                <div class="hexagon-container">
+                    <div class="hexagon">
+                        <span>📇</span>
+                        <h3>ID Registration</h3>
+                    </div>
+                    <div class="hexagon">
+                        <span>📚</span>
+                        <h3>Book Borrowing</h3>
+                    </div>
+                    <div class="hexagon">
+                        <span>🚪</span>
+                        <h3>Entry/Exit Tracking</h3>
+                    </div>
+                    <div class="hexagon">
+                        <span>👨‍🏫</span>
+                        <h3>Teacher Dashboard</h3>
+                    </div>
+                    <div class="hexagon">
+                        <span>📊</span>
+                        <h3>Student Reports</h3>
+                    </div>
+                </div>
+            </section>
+
+            <section id="help" class="full-page">
+                <h2>Help</h2>
+                <p>Need assistance? Our help section is designed to guide you through the features and usage of our Digital School ID system. Whether you are a student, teacher, or administrator, we provide step-by-step instructions to make the most out of this platform. From QR code registration to attendance tracking and library management, we are here to help. For further inquiries, check our contact section.</p>
+            </section>
+
+            <section id="contact" class="full-page">
+                <h2>Contact Us</h2>
+                <p>We value your feedback and inquiries! If you have any questions about our Digital School ID system or want to collaborate with us, feel free to reach out. You can contact us via email, phone, or by visiting our ICT department at Gelan Boys’ Boarding School. We are here to help you modernize school management and provide the best solutions for your institution.</p>
+            </section>
+        </main>
+    </div>
+
+    <script src="{% static 'css/home.js' %}"></script>
+</body>
+</html>

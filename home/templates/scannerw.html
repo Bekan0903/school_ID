@@ -1,0 +1,510 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Door Access Control System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --entry-color: #2ecc71;
+            --exit-color: #e74c3c;
+            --neutral-color: #3498db;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .scanner-container {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scan-box {
+            width: 250px;
+            height: 250px;
+            border: 4px solid var(--neutral-color);
+            border-radius: 8px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+            z-index: 10;
+        }
+        
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--neutral-color);
+            animation: scan 2s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        
+        .access-panel {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--neutral-color);
+        }
+        
+        .btn-entry {
+            background-color: var(--entry-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .btn-exit {
+            background-color: var(--exit-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .access-status {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        
+        .granted {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--entry-color);
+        }
+        
+        .denied {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--exit-color);
+        }
+        
+        .video-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-color: #000;
+        }
+        
+        #qr-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+        }
+        
+        .log-entry {
+            border-left: 4px solid var(--neutral-color);
+            transition: all 0.3s;
+        }
+        
+        .log-entry.entry {
+            border-left-color: var(--entry-color);
+        }
+        
+        .log-entry.exit {
+            border-left-color: var(--exit-color);
+        }
+        
+        .floating-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideIn 0.5s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { right: -100%; }
+            to { right: 20px; }
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Scanner Section -->
+            <div class="col-md-6 scanner-container p-0">
+                <div class="video-container">
+                    <video id="qr-video" playsinline></video>
+                </div>
+                <div class="scan-box">
+                    <div class="scan-line"></div>
+                </div>
+                <div class="position-absolute top-0 start-0 p-3">
+                    <h4 class="text-white"><i class="fas fa-door-open me-2"></i>Door Access Control</h4>
+                </div>
+                <div class="loading-spinner text-white">
+                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Section -->
+            <div class="col-md-6 p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-user-shield me-2"></i>Access Verification</h2>
+                    <button id="toggle-camera" class="btn btn-outline-primary">
+                        <i class="fas fa-camera-retro me-2"></i>Switch Camera
+                    </button>
+                </div>
+
+                <div id="verification-panel" class="access-panel p-4 mb-4" style="display: none;">
+                    <div class="text-center mb-4">
+                        <img id="user-avatar" src="https://via.placeholder.com/80" class="user-avatar mb-3">
+                        <h4 id="user-name">John Doe</h4>
+                        <p id="user-id" class="text-muted">ID: 12345678</p>
+                        <p id="user-type" class="text-muted">Type: Staff</p>
+                        <div id="access-status" class="access-status mb-3">Access Pending</div>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        <button id="entry-btn" class="btn btn-entry btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Confirm Entry
+                        </button>
+                        <button id="exit-btn" class="btn btn-exit btn-lg">
+                            <i class="fas fa-sign-out-alt me-2"></i>Confirm Exit
+                        </button>
+                    </div>
+                </div>
+
+                <div id="scan-instructions" class="text-center mt-5">
+                    <div class="mb-4">
+                        <i class="fas fa-qrcode fa-5x text-primary mb-3"></i>
+                        <h3>Ready to Scan</h3>
+                        <p class="text-muted">Scan a staff QR code to verify door access</p>
+                    </div>
+                </div>
+
+                <div class="mt-auto">
+                    <h5><i class="fas fa-clipboard-list me-2"></i>Access Log</h5>
+                    <div id="access-log" class="mt-3" style="max-height: 200px; overflow-y: auto;">
+                        <!-- Log entries will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const video = document.getElementById('qr-video');
+            const toggleCameraBtn = document.getElementById('toggle-camera');
+            const verificationPanel = document.getElementById('verification-panel');
+            const scanInstructions = document.getElementById('scan-instructions');
+            const entryBtn = document.getElementById('entry-btn');
+            const exitBtn = document.getElementById('exit-btn');
+            const accessLog = document.getElementById('access-log');
+            const accessStatus = document.getElementById('access-status');
+            const loadingSpinner = document.querySelector('.loading-spinner');
+            
+            // Variables
+            let currentFacingMode = 'environment';
+            let stream = null;
+            let scanning = false;
+            let currentUser = null;
+            
+            // Initialize scanner
+            initScanner();
+            
+            // Button event listeners
+            toggleCameraBtn.addEventListener('click', toggleCamera);
+            entryBtn.addEventListener('click', () => confirmAccess('entry'));
+            exitBtn.addEventListener('click', () => confirmAccess('exit'));
+            
+            // Initialize scanner function
+            function initScanner() {
+                startScanning();
+            }
+            
+            // Start scanning function
+            function startScanning() {
+                scanning = true;
+                
+                navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: currentFacingMode,
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                }).then(function(s) {
+                    stream = s;
+                    video.srcObject = stream;
+                    video.play();
+                    
+                    requestAnimationFrame(tick);
+                }).catch(function(err) {
+                    console.error("Error accessing camera:", err);
+                    showAlert('danger', 'Camera Error', 'Could not access the camera. Please ensure you have granted camera permissions.');
+                });
+            }
+            
+            // Stop scanning function
+            function stopScanning() {
+                scanning = false;
+                
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+                }
+            }
+            
+            // Toggle camera function
+            function toggleCamera() {
+                stopScanning();
+                currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+                startScanning();
+            }
+            
+            // Animation frame tick function
+            function tick() {
+                if (!scanning) return;
+                
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: 'dontInvert',
+                    });
+                    
+                    if (code) {
+                        handleScannedCode(code.data);
+                    }
+                }
+                
+                requestAnimationFrame(tick);
+            }
+            
+            function handleScannedCode(codeData) {
+    const parts = codeData.split(':');
+    if (parts.length !== 2 || !['STUDENT','WORKER'].includes(parts[0])) {
+        showAlert('warning', 'Invalid QR Code', 'Please scan a valid school ID');
+        return;
+    }
+    
+    stopScanning();
+    showLoading();
+    
+    fetch(`/api/verify-user/?user_type=${parts[0].toLowerCase()}&user_id=${parts[1]}`)
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.valid) {
+                currentUser = data.user;
+                if (data.user.status === 'active') {
+                    displayUserInfo(currentUser);
+                } else {
+                    showAlert('danger', 'Account Deactivated', 
+                             'This account is deactivated due to overdue books. Please return all books to reactivate.');
+                    // Hide form in library scanner
+                    if (document.getElementById('book-form')) {
+                        document.getElementById('book-form').style.display = 'none';
+                    }
+                    // Disable buttons in door scanner
+                    if (document.getElementById('entry-btn')) {
+                        document.getElementById('entry-btn').disabled = true;
+                        document.getElementById('exit-btn').disabled = true;
+                    }
+                    displayUserInfo(currentUser); // Still show user info but with disabled controls
+                }
+            } else {
+                showAlert('danger', 'Verification Failed', data.message);
+                startScanning();
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showAlert('danger', 'Error', 'Could not verify user');
+            console.error("Error:", error);
+            startScanning();
+        });
+}
+            // Display user information
+            function displayUserInfo(user) {
+                scanInstructions.style.display = 'none';
+                verificationPanel.style.display = 'block';
+                
+                document.getElementById('user-avatar').src = user.photo || 'https://via.placeholder.com/80';
+                document.getElementById('user-name').textContent = user.name;
+                document.getElementById('user-id').textContent = `ID: ${user.id}`;
+                document.getElementById('user-type').textContent = `Type: ${user.type.charAt(0).toUpperCase() + user.type.slice(1)}`;
+                if (user.status !== 'active') {
+        showAlert('danger', 'Account Deactivated', 
+                 'This account is deactivated due to overdue books. Please return all books to reactivate.');
+        document.getElementById('book-form').style.display = 'none'; // Hide form in library scanner
+        document.getElementById('entry-btn').disabled = true; // Disable entry in door scanner
+        document.getElementById('exit-btn').disabled = true; // Disable exit in door scanner
+    }
+            }
+            
+// Replace the confirmAccess function with:
+// In the confirmAccess function
+function confirmAccess(action) {
+    if (!currentUser) return;
+    
+    showLoading();
+    
+    fetch('/api/log-access/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            user_id: currentUser.id,
+            user_type: currentUser.type,
+            action: action,
+            location: 'main_gate' // You could make this dynamic if you have multiple scanners
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            // Add to access log display
+            const actionText = action === 'entry' ? 'ENTRY' : 'EXIT';
+            const actionClass = action === 'entry' ? 'bg-success' : 'bg-danger';
+            const lateNote = data.late_entry ? ' <span class="text-warning">(Late)</span>' : '';
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry p-3 mb-2 ${action}`;
+            logEntry.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <strong>${currentUser.name}</strong>
+                    <span class="badge ${actionClass}">${actionText}</span>
+                </div>
+                <small class="text-muted">${data.timestamp}${lateNote}</small>
+            `;
+            accessLog.insertBefore(logEntry, accessLog.firstChild);
+            
+            showAlert('success', 
+                `Access ${actionText} Recorded`, 
+                `${currentUser.name}'s ${action} was logged at ${data.timestamp}`);
+        } else {
+            showAlert('danger', 'Error', data.error || 'Failed to log access');
+        }
+        
+        // Reset for next scan
+        setTimeout(() => {
+            verificationPanel.style.display = 'none';
+            scanInstructions.style.display = 'block';
+            currentUser = null;
+            startScanning();
+        }, 2000);
+    })
+    .catch(error => {
+        hideLoading();
+        showAlert('danger', 'Error', 'Failed to connect to server');
+        console.error("Error:", error);
+    });
+}
+function sendAccessEmail(userId, userType, action) {
+    fetch('/api/send-access-email/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            user_id: userId,
+            user_type: userType,
+            action: action,
+            timestamp: new Date().toISOString()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Email notification sent');
+        } else {
+            console.error('Failed to send email:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+            // Show loading spinner
+            function showLoading() {
+                loadingSpinner.style.display = 'block';
+            }
+            
+            // Hide loading spinner
+            function hideLoading() {
+                loadingSpinner.style.display = 'none';
+            }
+            
+            // Show alert message
+            function showAlert(type, title, message) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show floating-alert`;
+                alertDiv.innerHTML = `
+                    <strong>${title}</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                document.body.appendChild(alertDiv);
+                
+                // Remove alert after 3 seconds
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            }
+            
+            // Function to get CSRF token from cookies
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+</body>
+</html>

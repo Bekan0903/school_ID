@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Profile</title>
+</head>
+<body>
+    <h1>Worker Profile</h1>
+
+    <img src="{{ worker.worker_photo.url }}" alt="worker photo" width="150">
+    <img src="{{ worker.qr_code.url }}" alt="Worker QR Code" width="150">
+    
+    <p><strong>Name:</strong> {{ worker.worker_name }}</p>
+    <p><strong>Age:</strong> {{ worker.worker_age }}</p>
+    <p><strong>Department:</strong> {{ worker.worker_department }}</p>
+    <p><strong>Email:</strong> {{ worker.worker_email }}</p>
+    <p><strong>Phone:</strong> {{ worker.worker_phone }}</p>
+    <p><strong>Address:</strong> {{ worker.worker_address }}</p>
+</body>
+</html>

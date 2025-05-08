@@ -1,0 +1,1478 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Digital ID Account</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@400;500&family=Open+Sans:wght@400;600&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Add this at the top of your my account.html -->
+{% if is_verified %}
+<div class="verification-banner">
+    <i class="fas fa-check-circle"></i>
+    <span>Verified View - Scanning Mode Active</span>
+</div>
+
+<style>
+    .verification-banner {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+</style>
+{% endif %}
+    <style>
+        :root {
+            /* Color Variables */
+            --digital-blue: #2563eb;
+            --digital-blue-light: #3b82f6;
+            --digital-purple: #7c3aed;
+            --digital-dark: #1e293b;
+            --digital-light: #f8fafc;
+            --digital-success: #10b981;
+            --digital-warning: #f59e0b;
+            --digital-danger: #ef4444;
+            --digital-gray: #64748b;
+            
+            /* Theme Variables */
+            --bg-color: rgba(0, 0, 0, 0.7);
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --text-color: white;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            
+            /* Font Variables */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size: 1rem;
+        }
+
+        /* Light Mode Variables */
+        .light-mode {
+            --bg-color: rgba(255, 255, 255, 0.9);
+            --card-bg: rgba(248, 250, 252, 0.9);
+            --text-color: #1e293b;
+            --border-color: rgba(30, 41, 59, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --digital-gray: #94a3b8;
+        }
+
+        /* Font Family Options */
+        .font-inter {
+            --font-family: 'Inter', sans-serif;
+        }
+        .font-roboto {
+            --font-family: 'Roboto', sans-serif;
+        }
+        .font-open-sans {
+            --font-family: 'Open Sans', sans-serif;
+        }
+        .font-poppins {
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        /* Font Size Options */
+        .font-small {
+            --font-size: 0.9rem;
+        }
+        .font-medium {
+            --font-size: 1rem;
+        }
+        .font-large {
+            --font-size: 1.1rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+            font-size: var(--font-size);
+        }
+
+        body {
+            background: linear-gradient(var(--bg-color), var(--bg-color)), 
+                        url('https://images.unsplash.com/photo-1639762681057-408e52192e55?q=80&w=2232&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .logo-icon {
+            color: var(--digital-blue-light);
+            font-size: 1.8rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: rgba(59, 130, 246, 0.1);
+            border: none;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: scale(1.05);
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--text-color);
+            transition: all 0.2s;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .notification-bell:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--digital-blue-light);
+            transform: scale(1.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -0.25rem;
+            right: -0.25rem;
+            background: var(--digital-danger);
+            color: white;
+            border-radius: 50%;
+            width: 1.25rem;
+            height: 1.25rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .notification-badge.active {
+            display: flex;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 3.5rem;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            width: 22rem;
+            max-height: 25rem;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            z-index: 100;
+            padding: 1rem 0;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .notification-dropdown.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .notification-item {
+            padding: 0.75rem 1.25rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .notification-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--digital-blue-light);
+        }
+
+        .notification-item.unread {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: var(--digital-gray);
+            margin-top: 0.25rem;
+        }
+
+        .no-notifications {
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--digital-gray);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .profile-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 8rem;
+            height: 8rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--digital-blue-light);
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+        }
+
+        .profile-email {
+            color: var(--digital-gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-phone {
+            color: var(--digital-blue-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .profile-nav {
+            margin-top: 1.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--text-color);
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+            width: 1.5rem;
+            text-align: center;
+        }
+
+        .qr-section {
+            margin-top: 2rem;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .qr-code {
+            width: 12rem;
+            height: 12rem;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .content-area {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--digital-gray);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-color);
+        }
+
+        .tab-btn.active {
+            color: var(--text-color);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 1.5rem;
+            width: calc(100% - 3rem);
+            height: 2px;
+            background: var(--digital-blue-light);
+            border-radius: 2px 2px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--digital-blue-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title i {
+            font-size: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .info-label {
+            width: 8rem;
+            color: var(--digital-gray);
+            font-size: 0.85rem;
+        }
+
+        .info-value {
+            flex: 1;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .verified {
+            color: var(--digital-success);
+            font-weight: 600;
+        }
+
+        .unverified {
+            color: var(--digital-danger);
+            font-weight: 600;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--digital-blue);
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--digital-blue-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--digital-blue-light);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+        }
+
+        .activity-description {
+            color: var(--digital-gray);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            color: var(--digital-gray);
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .activity-time i {
+            font-size: 0.7rem;
+        }
+
+        .no-activity {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--digital-gray);
+        }
+/* ===== Settings Tab Styles ===== */
+#settings-tab {
+    padding: 1.5rem 0;
+}
+
+.settings-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.settings-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.settings-section:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.settings-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    color: var(--digital-blue-light);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.settings-title i {
+    font-size: 1rem;
+    color: var(--digital-blue-light);
+}
+
+/* Font Options */
+.font-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.font-option {
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.font-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.font-option.active {
+    background: var(--digital-blue);
+    color: white;
+    border-color: var(--digital-blue);
+}
+
+/* Font Size Options */
+.font-size-options {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.font-size-btn {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: all 0.2s;
+}
+
+.font-size-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.font-size-btn.active {
+    background: var(--digital-blue);
+    color: white;
+    border-color: var(--digital-blue);
+}
+
+/* Theme Options */
+.theme-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.theme-option {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.theme-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-option.active {
+    background: var(--digital-blue);
+    color: white;
+    border-color: var(--digital-blue);
+}
+
+.theme-preview {
+    width: 100%;
+    height: 60px;
+    border-radius: 0.25rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.dark-preview {
+    background: linear-gradient(to right, #1e293b, #334155);
+}
+
+.light-preview {
+    background: linear-gradient(to right, #f8fafc, #e2e8f0);
+}
+
+/* Reset Button */
+.reset-settings {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.reset-settings .btn {
+    width: 100%;
+    padding: 0.75rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .settings-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .theme-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .settings-section {
+        padding: 1.25rem;
+    }
+}
+
+/* Animation for active states */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-content.active {
+    animation: fadeIn 0.3s ease-out;
+}
+        .info-row input[type="password"] {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    color: var(--text-color);
+    width: 100%;
+    max-width: 300px;
+}
+
+.light-mode .info-row input[type="password"] {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.info-row input[type="password"]:focus {
+    outline: none;
+    border-color: var(--digital-blue-light);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+        .font-options {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .font-option {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .font-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .font-option.active {
+            background: var(--digital-blue);
+            color: white;
+            border-color: var(--digital-blue);
+        }
+
+        .font-size-options {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .font-size-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .font-size-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .font-size-btn.active {
+            background: var(--digital-blue);
+            color: white;
+            border-color: var(--digital-blue);
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .theme-option {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .theme-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-option.active {
+            background: var(--digital-blue);
+            color: white;
+            border-color: var(--digital-blue);
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            background: var(--preview-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .dark-preview {
+            --preview-bg: linear-gradient(to right, #1e293b, #334155);
+        }
+
+        .light-preview {
+            --preview-bg: linear-gradient(to right, #f8fafc, #e2e8f0);
+        }
+
+        .reset-settings {
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card {
+                order: 1;
+            }
+
+            .notification-dropdown {
+                width: 90vw;
+                right: -1rem;
+            }
+            
+            .font-options {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Animation for new notification */
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            50% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+    </style>
+</head>
+<body class="font-inter font-medium">
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-id-card logo-icon"></i>
+                <span>Digital ID</span>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div class="notification-container">
+                    <div class="notification-bell" id="notificationBell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">3</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="no-notifications">
+                            <i class="fas fa-bell-slash" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                            <p>No new notifications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="profile-card">
+                <div class="profile-header">
+                    {% if user_data.photo %}
+                        <img src="{{ user_data.photo }}" alt="Profile" class="profile-avatar">
+                    {% else %}
+                        <div class="profile-avatar" style="background-color: #3b82f6; color: white; display: flex; align-items: center; justify-content: center;">
+                            {{ user_data.name|first|upper }}
+                        </div>
+                    {% endif %}
+                    <h2 class="profile-name">{{ user_data.name }}</h2>
+                    <p class="profile-email">{{ user_data.email }}</p>
+                    <p class="profile-phone">{{ user_data.phone }}</p>
+                </div>
+
+                <div class="profile-nav">
+                    <a href="#" class="nav-item active" data-tab="profile">
+                        <i class="fas fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="#" class="nav-item" data-tab="activities">
+                        <i class="fas fa-history"></i>
+                        <span>Recent Activities</span>
+                    </a>
+                    <a href="#" class="nav-item" data-tab="security">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security</span>
+                    </a>
+                    <a href="#" class="nav-item" data-tab="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+
+                <div class="qr-section">
+                    <div class="qr-code">
+                        {% if user_data.qr_code %}
+                            <img src="{{ user_data.qr_code }}" alt="Digital ID QR Code">
+                        {% else %}
+                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--digital-gray);">
+                                QR Code not available
+                            </div>
+                        {% endif %}
+                    </div>
+                    <p>Scan this QR code for verification</p>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="tab-header">
+                    <button class="tab-btn active" data-tab="profile">Profile</button>
+                    <button class="tab-btn" data-tab="activities">Activities</button>
+                    <button class="tab-btn" data-tab="security">Security</button>
+                    <button class="tab-btn" data-tab="settings">Settings</button>
+                </div>
+
+                <div class="tab-content active" id="profile-tab">
+                    <div class="profile-grid">
+                        <div class="info-card">
+                            <h3 class="card-title"><i class="fas fa-id-card"></i> Personal Information</h3>
+                            <div class="info-row">
+                                <span class="info-label">Full Name:</span>
+                                <span class="info-value">{{ user_data.name }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Age:</span>
+                                <span class="info-value">{{ user_data.age }}</span>
+                            </div>
+                            {% if user_type == 'student' %}
+                            <div class="info-row">
+                                <span class="info-label">Class:</span>
+                                <span class="info-value">{{ user_data.class }} - {{ user_data.section }}</span>
+                            </div>
+                            {% else %}
+                            <div class="info-row">
+                                <span class="info-label">Department:</span>
+                                <span class="info-value">{{ user_data.department }}</span>
+                            </div>
+                            {% endif %}
+                            {% if user_type == 'student' %}
+                            <div class="info-row">
+                                <span class="info-label">Parent:</span>
+                                <span class="info-value">{{ user_data.parent_name }} ({{ user_data.parent_relation }})</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="info-card">
+                            <h3 class="card-title"><i class="fas fa-address-book"></i> Contact Details</h3>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">{{ user_data.email }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phone:</span>
+                                <span class="info-value">{{ user_data.phone }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Address:</span>
+                                <span class="info-value">{{ user_data.address }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <h3 class="card-title"><i class="fas fa-user-check"></i> Account Status</h3>
+                            <div class="info-row">
+                                <span class="info-label">Member Since:</span>
+                                <span class="info-value">Today</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Status:</span>
+                                <span class="info-value verified">Active</span>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <h3 class="card-title"><i class="fas fa-check-circle"></i> Verifications</h3>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value verified">Verified</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phone:</span>
+                                <span class="info-value verified">Verified</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- In the activities-tab section of myaccount.html -->
+<div class="tab-content" id="activities-tab">
+    <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; font-weight: 600; color: var(--digital-blue-light);">
+        Recent Activities
+    </h3>
+    
+    {% for activity in recent_activities %}
+    <div class="activity-item">
+        <div class="activity-icon">
+            {% if activity.type == 'login' %}
+                <i class="fas fa-sign-in-alt"></i>
+            {% elif activity.type == 'qr_generated' %}
+                <i class="fas fa-qrcode"></i>
+            {% elif activity.type == 'entry' %}
+                <i class="fas fa-door-open"></i>
+            {% elif activity.type == 'exit' %}
+                <i class="fas fa-door-closed"></i>
+            {% elif activity.type == 'library' %}
+                <i class="fas fa-book"></i>
+            {% else %}
+                <i class="fas fa-history"></i>
+            {% endif %}
+        </div>
+        <div class="activity-details">
+            <div class="activity-title">
+                {% if activity.type == 'login' %}
+                    Account Login
+                {% elif activity.type == 'qr_generated' %}
+                    QR Code Generated
+                {% elif activity.type == 'entry' %}
+                    School Entry
+                {% elif activity.type == 'exit' %}
+                    School Exit
+                {% elif activity.type == 'library' %}
+                    Library Activity
+                {% else %}
+                    System Activity
+                {% endif %}
+            </div>
+            <div class="activity-description">
+                {% if activity.type == 'login' %}
+                    Successful login to Digital ID system
+                {% elif activity.type == 'qr_generated' %}
+                    Your personal QR code was created
+                {% elif activity.type == 'entry' %}
+                    Entered school at {{ activity.location|default:"main gate" }}
+                    {% if activity.late %}<span class="text-warning">(Late entry)</span>{% endif %}
+                {% elif activity.type == 'exit' %}
+                    Exited school at {{ activity.location|default:"main gate" }}
+                {% elif activity.type == 'library' %}
+                    "{{ activity.book_title }}" - Due: {{ activity.due_date|date:"F j, Y" }}
+                {% else %}
+                    {{ activity.description }}
+                {% endif %}
+            </div>
+            <div class="activity-time">
+                <i class="far fa-clock"></i> 
+                {{ activity.timestamp|date:"F j, Y, g:i a" }}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="no-activity">
+        <i class="fas fa-history" style="font-size: 2rem; margin-bottom: 1rem; color: var(--digital-gray);"></i>
+        <p>No recent activities found</p>
+    </div>
+    {% endfor %}
+</div>
+
+                <div class="tab-content" id="security-tab">
+                    <div class="profile-grid">
+                       <!-- Add this to the security-tab section in my account.html -->
+<div class="info-card">
+    <h3 class="card-title"><i class="fas fa-key"></i> Change Password</h3>
+    <form id="passwordChangeForm">
+        <div class="info-row">
+            <span class="info-label">Current Password:</span>
+            <input type="password" id="currentPassword" class="info-value" required>
+        </div>
+        <div class="info-row">
+            <span class="info-label">New Password:</span>
+            <input type="password" id="newPassword" class="info-value" required minlength="8">
+        </div>
+        <div class="info-row">
+            <span class="info-label">Confirm Password:</span>
+            <input type="password" id="confirmPassword" class="info-value" required minlength="8">
+        </div>
+        <div class="info-row" style="justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary">Change Password</button>
+        </div>
+        <div id="passwordChangeMessage" style="margin-top: 1rem;"></div>
+    </form>
+</div>
+                    
+
+                        </div>
+
+                        <div class="info-card">
+                            <h3 class="card-title"><i class="fas fa-shield-alt"></i> Security Status</h3>
+                            <div class="info-row">
+                                <span class="info-label">Last Login:</span>
+                                <span class="info-value">Just now</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Threats:</span>
+                                <span class="info-value">No threats detected</span>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <h3 class="card-title"><i class="fas fa-bell"></i> Notifications</h3>
+                            <div class="info-row">
+                                <span class="info-label">Email Alerts:</span>
+                                <span class="info-value verified">Enabled</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">SMS Alerts:</span>
+                                <span class="info-value">Disabled</span>
+                            </div>
+                        </div>
+
+
+                        <div class="info-card">
+                            <h3 class="card-title"><i class="fas fa-history"></i> Recent Logins</h3>
+                            <div class="info-row">
+                                <span class="info-label">This Device:</span>
+                                <span class="info-value">Just now</span>
+                            </div>
+                        </div>
+                        
+                        </div>
+                    </div>
+                </div>
+                 <!-- In the settings-tab section -->
+<div class="tab-content" id="settings-tab">
+    <div class="settings-container">
+        <div class="settings-section">
+            <h3 class="settings-title"><i class="fas fa-font"></i> Font Style</h3>
+            <div class="font-options">
+                <div class="font-option active" data-font="inter">Inter</div>
+                <div class="font-option" data-font="roboto">Roboto</div>
+                <div class="font-option" data-font="open-sans">Open Sans</div>
+                <div class="font-option" data-font="poppins">Poppins</div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="settings-title"><i class="fas fa-text-height"></i> Font Size</h3>
+            <div class="font-size-options">
+                <div class="font-size-btn" data-size="small">A</div>
+                <div class="font-size-btn active" data-size="medium">A</div>
+                <div class="font-size-btn" data-size="large">A</div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="settings-title"><i class="fas fa-palette"></i> Theme</h3>
+            <div class="theme-options">
+                <div class="theme-option active" data-theme="dark">
+                    <div class="theme-preview dark-preview"></div>
+                    Dark Mode
+                </div>
+                <div class="theme-option" data-theme="light">
+                    <div class="theme-preview light-preview"></div>
+                    Light Mode
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section reset-settings">
+            <button class="btn btn-secondary">
+                <i class="fas fa-undo"></i> Reset to Default Settings
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Helper Functions
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        function showAlert(container, message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            container.innerHTML = '';
+            container.appendChild(alertDiv);
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => alertDiv.remove(), 300);
+                }, 5000);
+            }
+        }
+    
+        // Tab Switching Functionality
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Deactivate all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Deactivate all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Activate the selected tab
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+            
+            // Activate the corresponding button
+            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+            
+            // Activate the corresponding nav item
+            document.querySelector(`.nav-item[data-tab="${tabId}"]`).classList.add('active');
+        }
+    
+        // Add click events to tab buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+        
+        // Add click events to nav items
+        document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabId = this.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+    
+        // Password Change Functionality
+        document.getElementById('passwordChangeForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageDiv = document.getElementById('passwordChangeMessage');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            
+            // Validate form
+            if (newPassword !== confirmPassword) {
+                showAlert(messageDiv, 'New passwords do not match!', 'danger');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                showAlert(messageDiv, 'Password must be at least 8 characters!', 'danger');
+                return;
+            }
+            
+            // Disable button during request
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            
+            try {
+                const response = await fetch('/api/change-password/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to change password');
+                }
+                
+                if (data.success) {
+                    showAlert(messageDiv, '✓ Password changed successfully!', 'success');
+                    form.reset();
+                } else {
+                    showAlert(messageDiv, data.message || 'Password change failed', 'danger');
+                }
+            } catch (error) {
+                console.error('Password change error:', error);
+                showAlert(messageDiv, error.message || 'Error changing password. Please try again.', 'danger');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Change Password';
+            }
+        });
+    
+        // Settings Functionality
+        // Font selection
+        document.querySelectorAll('.font-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.font-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                document.body.className = document.body.className.replace(/\bfont-\S+/g, '');
+                document.body.classList.add(`font-${this.dataset.font}`);
+                localStorage.setItem('digitalIdFont', this.dataset.font);
+            });
+        });
+    
+        // Font size selection
+        document.querySelectorAll('.font-size-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.font-size-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.body.className = document.body.className.replace(/\bfont-\S+/g, '');
+                document.body.classList.add(`font-${this.dataset.size}`);
+                localStorage.setItem('digitalIdFontSize', this.dataset.size);
+            });
+        });
+    
+        // Theme selection
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (this.dataset.theme === 'light') {
+                    document.body.classList.add('light-mode');
+                    document.getElementById('themeIcon').classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    document.body.classList.remove('light-mode');
+                    document.getElementById('themeIcon').classList.replace('fa-sun', 'fa-moon');
+                }
+                
+                localStorage.setItem('digitalIdTheme', this.dataset.theme);
+            });
+        });
+    
+        // Reset settings
+        document.querySelector('.reset-settings .btn')?.addEventListener('click', function() {
+            // Reset font
+            document.body.className = document.body.className.replace(/\bfont-\S+/g, '');
+            document.body.classList.add('font-inter', 'font-medium');
+            document.querySelectorAll('.font-option').forEach(opt => opt.classList.remove('active'));
+            document.querySelector('.font-option[data-font="inter"]').classList.add('active');
+            
+            // Reset font size
+            document.querySelectorAll('.font-size-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.font-size-btn[data-size="medium"]').classList.add('active');
+            
+            // Reset theme
+            document.body.classList.remove('light-mode');
+            document.getElementById('themeIcon').classList.replace('fa-sun', 'fa-moon');
+            document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+            document.querySelector('.theme-option[data-theme="dark"]').classList.add('active');
+            
+            // Clear localStorage
+            localStorage.removeItem('digitalIdFont');
+            localStorage.removeItem('digitalIdFontSize');
+            localStorage.removeItem('digitalIdTheme');
+            
+            // Show confirmation
+            showAlert(document.querySelector('.reset-settings'), 'Settings have been reset to defaults', 'success');
+        });
+    
+        // Theme Toggle Button
+        document.getElementById('themeToggle')?.addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            if (document.body.classList.contains('light-mode')) {
+                document.getElementById('themeIcon').classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('digitalIdTheme', 'light');
+                document.querySelector('.theme-option[data-theme="light"]').click();
+            } else {
+                document.getElementById('themeIcon').classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('digitalIdTheme', 'dark');
+                document.querySelector('.theme-option[data-theme="dark"]').click();
+            }
+        });
+    
+        // Load saved settings
+        function loadSettings() {
+            const savedFont = localStorage.getItem('digitalIdFont') || 'inter';
+            const savedSize = localStorage.getItem('digitalIdFontSize') || 'medium';
+            const savedTheme = localStorage.getItem('digitalIdTheme') || 'dark';
+            
+            // Apply font
+            document.body.classList.add(`font-${savedFont}`);
+            document.querySelector(`.font-option[data-font="${savedFont}"]`).classList.add('active');
+            
+            // Apply font size
+            document.body.classList.add(`font-${savedSize}`);
+            document.querySelector(`.font-size-btn[data-size="${savedSize}"]`).classList.add('active');
+            
+            // Apply theme
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeIcon').classList.replace('fa-moon', 'fa-sun');
+                document.querySelector('.theme-option[data-theme="light"]').classList.add('active');
+            } else {
+                document.body.classList.remove('light-mode');
+                document.getElementById('themeIcon').classList.replace('fa-sun', 'fa-moon');
+                document.querySelector('.theme-option[data-theme="dark"]').classList.add('active');
+            }
+        }
+    
+        // Initialize
+        loadSettings();
+    });
+    </script>
+
+    
+</body>
+</html>

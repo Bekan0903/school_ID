@@ -1,0 +1,394 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Scanner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .scanner-container {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .scan-box {
+            width: 300px;
+            height: 300px;
+            border: 4px solid #3498db;
+            border-radius: 8px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+            z-index: 10;
+        }
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #3498db;
+            animation: scan 2s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        #qr-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+        }
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            display: none;
+        }
+        .floating-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideIn 0.5s forwards;
+        }
+        @keyframes slideIn {
+            from { right: -100%; }
+            to { right: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Scanner Section -->
+            <div class="col-md-6 scanner-container p-0">
+                <video id="qr-video" playsinline></video>
+                <div class="scan-box">
+                    <div class="scan-line"></div>
+                </div>
+                <div class="position-absolute top-0 start-0 p-3">
+                    <h4 class="text-white"><i class="fas fa-book me-2"></i>Library Scanner</h4>
+                </div>
+                <div class="loading-spinner text-white">
+                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Section -->
+            <div class="col-md-6 p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-book-reader me-2"></i>Book Checkout</h2>
+                    <button id="toggle-camera" class="btn btn-outline-primary">
+                        <i class="fas fa-camera-retro me-2"></i>Switch Camera
+                    </button>
+                </div>
+                <div class="return books">
+                    <a href="{% url 'return_book' %}"><button><i class="fas fa-camera-retro me-2"></i> Return Book</button></a>
+                </div>
+
+                <!-- Verification Panel -->
+                <div id="verification-panel" class="card p-4 mb-4" style="display: none;">
+                    <div class="text-center mb-4">
+                        <img id="user-avatar" src="https://via.placeholder.com/100" class="rounded-circle mb-3" width="100">
+                        <h4 id="user-name">John Doe</h4>
+                        <p id="user-id" class="text-muted">ID: 12345678</p>
+                        <p id="user-type" class="text-muted">Type: Student</p>
+                        <div id="verification-status" class="badge bg-success mb-3">Verified</div>
+                    </div>
+
+                    <!-- Book Checkout Form -->
+                    <form id="book-form">
+                        <div class="mb-3">
+                            <label for="book-title" class="form-label">Book Title</label>
+                            <input type="text" class="form-control" id="book-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="book-author" class="form-label">Book Author</label>
+                            <input type="text" class="form-control" id="book-author" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="borrow-duration" class="form-label">Borrow Duration</label>
+                            <select class="form-select" id="borrow-duration">
+                                <option value="5">5 Minutes (Testing)</option>
+                                <option value="60">1 Hour</option>
+                                <option value="1440">1 Day</option>
+                                <option value="10080">1 Week</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="confirm-checkout" class="btn btn-primary w-100">
+                            <i class="fas fa-check-circle me-2"></i>Confirm Checkout
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Scan Instructions -->
+                <div id="scan-instructions" class="text-center mt-auto">
+                    <div class="mb-4">
+                        <i class="fas fa-qrcode fa-5x text-primary mb-3"></i>
+                        <h3>Ready to Scan</h3>
+                        <p class="text-muted">Scan a student/staff ID to begin checkout</p>
+                    </div>
+                </div>
+
+                <!-- Checkout Receipt -->
+                <div id="checkout-receipt" class="card mt-4 p-3" style="display: none;">
+                    <h5><i class="fas fa-receipt me-2"></i>Checkout Receipt</h5>
+                    <div id="receipt-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOM Elements
+        const video = document.getElementById('qr-video');
+        const toggleCameraBtn = document.getElementById('toggle-camera');
+        const verificationPanel = document.getElementById('verification-panel');
+        const scanInstructions = document.getElementById('scan-instructions');
+        const bookForm = document.getElementById('book-form');
+        const confirmBtn = document.getElementById('confirm-checkout');
+        const loadingSpinner = document.querySelector('.loading-spinner');
+        const checkoutReceipt = document.getElementById('checkout-receipt');
+        
+        // Variables
+        let currentFacingMode = 'environment';
+        let stream = null;
+        let scanning = false;
+        let currentUser = null;
+        
+         // Initialize scanner
+         initScanner();
+        
+        // Event Listeners
+        toggleCameraBtn.addEventListener('click', toggleCamera);
+        bookForm.addEventListener('submit', handleCheckout);
+
+        function initScanner() {
+                startScanning();
+            }
+        
+   // Start scanning function
+   function startScanning() {
+                scanning = true;
+                
+                navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: currentFacingMode,
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                }).then(function(s) {
+                    stream = s;
+                    video.srcObject = stream;
+                    video.play();
+                    
+                    requestAnimationFrame(tick);
+                }).catch(function(err) {
+                    console.error("Error accessing camera:", err);
+                    showAlert('danger', 'Camera Error', 'Could not access the camera. Please ensure you have granted camera permissions.');
+                });
+            }
+        
+        function stopScanning() {
+            scanning = false;
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+        }
+        
+        function toggleCamera() {
+            stopScanning();
+            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            startScanning();
+        }
+        
+        function tick() {
+            if (!scanning) return;
+            
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code) {
+                    handleScannedCode(code.data);
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+        
+        function handleScannedCode(codeData) {
+    const parts = codeData.split(':');
+    if (parts.length !== 2 || !['STUDENT','WORKER'].includes(parts[0])) {
+        showAlert('warning', 'Invalid QR Code', 'Please scan a valid school ID');
+        return;
+    }
+    
+    stopScanning();
+    showLoading();
+    
+    fetch(`/api/verify-user/?user_type=${parts[0].toLowerCase()}&user_id=${parts[1]}`)
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.valid) {
+                currentUser = data.user;
+                if (data.user.status === 'active') {
+                    displayUserInfo(currentUser);
+                } else {
+                    showAlert('danger', 'Account Deactivated', 
+                             'This account is deactivated due to overdue books. Please return all books to reactivate.');
+                    // Hide form in library scanner
+                    if (document.getElementById('book-form')) {
+                        document.getElementById('book-form').style.display = 'none';
+                    }
+                    // Disable buttons in door scanner
+                    if (document.getElementById('entry-btn')) {
+                        document.getElementById('entry-btn').disabled = true;
+                        document.getElementById('exit-btn').disabled = true;
+                    }
+                    displayUserInfo(currentUser); // Still show user info but with disabled controls
+                }
+            } else {
+                showAlert('danger', 'Verification Failed', data.message);
+                startScanning();
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showAlert('danger', 'Error', 'Could not verify user');
+            console.error("Error:", error);
+            startScanning();
+        });
+}
+        
+        function displayUserInfo(user) {
+            scanInstructions.style.display = 'none';
+            verificationPanel.style.display = 'block';
+            
+            document.getElementById('user-avatar').src = user.photo || 'https://via.placeholder.com/100';
+            document.getElementById('user-name').textContent = user.name;
+            document.getElementById('user-id').textContent = `ID: ${user.id}`;
+            document.getElementById('user-type').textContent = `Type: ${user.type.charAt(0).toUpperCase() + user.type.slice(1)}`;
+            
+            const statusBadge = document.getElementById('verification-status');
+            statusBadge.textContent = user.status === 'active' ? 'Verified' : 'Not Active';
+            statusBadge.className = user.status === 'active' ? 'badge bg-success' : 'badge bg-danger';
+        }
+        
+        // Checkout Functions
+        function handleCheckout(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showAlert('warning', 'No User', 'Please scan an ID first');
+                return;
+            }
+            
+            const bookTitle = document.getElementById('book-title').value.trim();
+            const bookAuthor = document.getElementById('book-author').value.trim();
+            const borrowMinutes = document.getElementById('borrow-duration').value;
+            
+            if (!bookTitle || !bookAuthor) {
+                showAlert('warning', 'Missing Info', 'Please fill all fields');
+                return;
+            }
+            
+            // Disable button during processing
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing';
+            
+            fetch('/api/checkout-book/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    user_type: currentUser.type,
+                    book_title: bookTitle,
+                    book_author: bookAuthor,
+                    borrow_minutes: borrowMinutes
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', 'Success', `Checked out to ${currentUser.name}`);
+                    showReceipt(data, bookTitle, bookAuthor);
+                    bookForm.reset();
+                } else {
+                    throw new Error(data.message || 'Checkout failed');
+                }
+            })
+            .catch(error => {
+                showAlert('danger', 'Error', error.message);
+                console.error('Checkout error:', error);
+            })
+            .finally(() => {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirm Checkout';
+            });
+        }
+        
+        function showReceipt(data, title, author) {
+            checkoutReceipt.style.display = 'block';
+            document.getElementById('receipt-content').innerHTML = `
+                <p><strong>Book:</strong> ${title}</p>
+                <p><strong>Author:</strong> ${author}</p>
+                <p><strong>Checked out to:</strong> ${currentUser.name}</p>
+                <p><strong>Due:</strong> ${new Date(data.due_date).toLocaleString()}</p>
+                <p><strong>Checkout ID:</strong> ${data.checkout_id}</p>
+            `;
+        }
+        
+        // Utility Functions
+        function showLoading() {
+            loadingSpinner.style.display = 'block';
+        }
+        
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+        }
+        
+        function showAlert(type, title, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show floating-alert`;
+            alertDiv.innerHTML = `
+                <strong>${title}</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+        
+        function getCookie(name) {
+            const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return cookieValue ? cookieValue.pop() : '';
+        }
+    });
+    </script>
+</body>
+</html>

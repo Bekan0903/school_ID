@@ -1,0 +1,683 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .header h1 {
+            color: #f0f0f0;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .header p {
+            color: #a0a0a0;
+        }
+        
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .option-box {
+            background: white;
+            border-radius: 15px;
+            width: 350px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .dark-mode .option-box {
+            background: #2d2d2d;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .option-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dark-mode .option-box:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .librarian-box {
+            border-top: 5px solid #3498db;
+        }
+        
+        .security-box {
+            border-top: 5px solid #e74c3c;
+        }
+        
+        .option-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .librarian-icon {
+            color: #3498db;
+        }
+        
+        .security-icon {
+            color: #e74c3c;
+        }
+        
+        .option-box h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .option-box h2 {
+            color: #f0f0f0;
+        }
+        
+        .option-box p {
+            color: #7f8c8d;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .option-box p {
+            color: #a0a0a0;
+        }
+        
+        .login-form-container {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin: 40px auto 0;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .login-form-container {
+            background: #2d2d2d;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-form-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .form-header h2 {
+            color: #f0f0f0;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .form-group label {
+            color: #f0f0f0;
+        }
+        
+        .form-group select, 
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+        
+        .dark-mode .form-group select,
+        .dark-mode .form-group input {
+            background-color: #3d3d3d;
+            border-color: #555;
+            color: #f0f0f0;
+        }
+        
+        .form-group select:focus, 
+        .form-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .submit-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: #2980b9;
+        }
+        
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+        
+        /* Settings Button and Panel Styles */
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #3498db;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-btn:hover {
+            transform: rotate(30deg);
+            background: #2980b9;
+        }
+        
+        .settings-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            z-index: 999;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .dark-mode .settings-panel {
+            background: #2d2d2d;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .settings-panel.active {
+            transform: translateX(0);
+        }
+        
+        .settings-panel h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .dark-mode .settings-panel h3 {
+            color: #f0f0f0;
+        }
+        
+        .settings-option {
+            margin-bottom: 15px;
+        }
+        
+        .settings-option label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .dark-mode .settings-option label {
+            color: #f0f0f0;
+        }
+        
+        .settings-option select, 
+        .settings-option input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+        }
+        
+        .dark-mode .settings-option select,
+        .dark-mode .settings-option input {
+            background: #3d3d3d;
+            border-color: #555;
+            color: #f0f0f0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #3498db;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Font style classes */
+        .font-arial {
+            font-family: Arial, sans-serif;
+        }
+        
+        .font-times {
+            font-family: "Times New Roman", serif;
+        }
+        
+        .font-courier {
+            font-family: "Courier New", monospace;
+        }
+        
+        .font-georgia {
+            font-family: Georgia, serif;
+        }
+        
+        /* Font size classes */
+        .font-small {
+            font-size: 14px;
+        }
+        
+        .font-medium {
+            font-size: 16px;
+        }
+        
+        .font-large {
+            font-size: 18px;
+        }
+        
+        .font-xlarge {
+            font-size: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="font-medium font-arial">
+    <div class="settings-btn" onclick="toggleSettingsPanel()">
+        <i class="fas fa-cog"></i>
+    </div>
+    
+    <div class="settings-panel">
+        <h3>Settings</h3>
+        
+        <div class="settings-option">
+            <label>Font Style</label>
+            <select id="fontStyle" onchange="changeFontStyle(this.value)">
+                <option value="arial">Arial</option>
+                <option value="times">Times New Roman</option>
+                <option value="courier">Courier New</option>
+                <option value="georgia">Georgia</option>
+            </select>
+        </div>
+        
+        <div class="settings-option">
+            <label>Font Size</label>
+            <select id="fontSize" onchange="changeFontSize(this.value)">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+            </select>
+        </div>
+        
+        <div class="settings-option">
+            <div class="toggle-label">
+                <span>Dark Mode</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Admin Portal</h1>
+            <p>Please select your role to continue</p>
+        </div>
+        
+        <div class="options-container">
+            <div class="option-box librarian-box" onclick="showLoginForm('librarian')">
+                <div class="option-icon librarian-icon">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <h2>Librarian</h2>
+                <p>Access the library management system to scan books, manage inventory, and assist patrons.</p>
+            </div>
+            
+            <div class="option-box security-box" onclick="showLoginForm('security')">
+                <div class="option-icon security-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2>Security</h2>
+                <p>Access the security portal to monitor building access and manage security protocols.</p>
+            </div>
+        </div>
+        
+        <div class="login-form-container" id="loginForm">
+            <div class="form-header">
+                <h2 id="formTitle">Login</h2>
+                <p id="formDescription">Enter your credentials to access the system</p>
+            </div>
+            
+            <form id="adminForm">
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" disabled>
+                        <option value="librarian">Librarian</option>
+                        <option value="security">Security</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">Login</button>
+                <a href="#" class="back-btn" onclick="hideLoginForm()"><i class="fas fa-arrow-left"></i> Back to role selection</a>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Settings panel toggle
+        function toggleSettingsPanel() {
+            const panel = document.querySelector('.settings-panel');
+            panel.classList.toggle('active');
+        }
+        
+        // Font style change
+        function changeFontStyle(style) {
+            document.body.classList.remove('font-arial', 'font-times', 'font-courier', 'font-georgia');
+            document.body.classList.add(`font-${style}`);
+            localStorage.setItem('fontStyle', style);
+        }
+        
+        // Font size change
+        function changeFontSize(size) {
+            document.body.classList.remove('font-small', 'font-medium', 'font-large', 'font-xlarge');
+            document.body.classList.add(`font-${size}`);
+            localStorage.setItem('fontSize', size);
+        }
+        
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            document.getElementById('darkModeToggle').checked = isDarkMode;
+        }
+        
+        // Load saved preferences
+        function loadPreferences() {
+            // Font style
+            const savedFontStyle = localStorage.getItem('fontStyle') || 'arial';
+            document.getElementById('fontStyle').value = savedFontStyle;
+            changeFontStyle(savedFontStyle);
+            
+            // Font size
+            const savedFontSize = localStorage.getItem('fontSize') || 'medium';
+            document.getElementById('fontSize').value = savedFontSize;
+            changeFontSize(savedFontSize);
+            
+            // Dark mode
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (savedDarkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').checked = true;
+            }
+        }
+        
+        // Initialize
+        window.onload = function() {
+            loadPreferences();
+            
+            // Close settings panel when clicking outside
+            document.addEventListener('click', function(e) {
+                const settingsBtn = document.querySelector('.settings-btn');
+                const settingsPanel = document.querySelector('.settings-panel');
+                
+                if (!settingsBtn.contains(e.target) && !settingsPanel.contains(e.target)) {
+                    settingsPanel.classList.remove('active');
+                }
+            });
+        };
+        
+        function showLoginForm(role) {
+            const form = document.getElementById('loginForm');
+            const departmentSelect = document.getElementById('department');
+            const formTitle = document.getElementById('formTitle');
+            const formDescription = document.getElementById('formDescription');
+            
+            // Set the department based on the selected role
+            departmentSelect.value = role;
+            
+            // Update the form title and description
+            if (role === 'librarian') {
+                formTitle.textContent = 'Librarian Login';
+                formDescription.textContent = 'Enter your password to access the library system';
+            } else {
+                formTitle.textContent = 'Security Login';
+                formDescription.textContent = 'Enter your password to access the security portal';
+            }
+            
+            // Show the form
+            form.classList.add('active');
+            
+            // Scroll to the form smoothly
+            form.scrollIntoView({ behavior: 'smooth' });
+            
+            // Focus on the password field
+            document.getElementById('password').focus();
+        }
+        
+        function hideLoginForm() {
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('password').value = '';
+        }
+            // Add this function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+        
+        // Handle form submission
+    document.getElementById('adminForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const department = document.getElementById('department').value;
+        const password = document.getElementById('password').value;
+        
+        // Show loading state
+        const submitBtn = document.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Logging in...';
+        
+        // Send login request
+        fetch('/admin-login/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                department: department,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.department.toLowerCase() === 'librarian') {
+                    window.location.href = '/scanner/';
+                } else if (data.department.toLowerCase() === 'security') {
+                    window.location.href = '/scannerw/';
+                }
+            } else {
+                showAlert('danger', 'Login Failed', data.message);
+            }
+        })
+        .catch(error => {
+            showAlert('danger', 'Error', 'Login failed. Please try again.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Login';
+        });
+    });
+    function showAlert(type, title, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show floating-alert`;
+        alertDiv.innerHTML = `
+            <strong>${title}</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        // Remove alert after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+    </script>
+</body>
+</html>

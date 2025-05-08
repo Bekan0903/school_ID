@@ -1,0 +1,14 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+</head>
+<body>
+    <h1>Welcome to the portal page</h1>
+    <a href="{% url 'student_profile' %}">are you a student</a><br>
+    <a href="{% url 'worker_profile' %}">or are you a worker</a><br>
+</body>
+</html>
