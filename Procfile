@@ -1,1 +1,1 @@
-web: gunicorn digital_school_ID.wsgi
+web: gunicorn digital_school_ID.wsgi:application
