@@ -61,5 +61,4 @@ The platform is built to improve:
 
 ---
 
-## 📁 Project Structure
 
